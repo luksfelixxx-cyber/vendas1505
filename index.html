@@ -330,7 +330,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
         <div class="md-val" id="mdVal">—</div>
         <div class="md-sub" id="mdSub"></div>
       </div>
-      <div class="md-badge">META<br>DIA</div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">
+        <div class="md-badge">META<br>DIA</div>
+        <button onclick="relatorioGeral()" style="background:linear-gradient(135deg,#25d366,#128c7e);border:none;color:#fff;padding:7px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;white-space:nowrap">📲 Relatório Geral</button>
+      </div>
     </div>
   </div>
 
@@ -743,7 +746,10 @@ function openSetor(setor){
       <div class="md-val">${fk(st.dia)}</div>
       <div class="md-sub">Falta ${f0(st.falta)} · ${DIAS_REST} dias</div>
     </div>
-    <span class="ritmo-badge ${ritmoClr}" style="flex-shrink:0">${st.ritmo.txt}</span>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">
+      <span class="ritmo-badge ${ritmoClr}">${st.ritmo.txt}</span>
+      <button onclick="relatorioSetor('${setor.replace(/'/g,"\'")}')" style="background:linear-gradient(135deg,#25d366,#128c7e);border:none;color:#fff;padding:7px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit">📲 Enviar WhatsApp</button>
+    </div>
   `;
 
   renderList();renderSemMeta();renderPerdidos();renderRegredindo();renderNaoProj();renderProj();
@@ -953,6 +959,141 @@ function openClient(raw){
 }
 
 renderOverview();
+
+
+// ══════════════════════════════
+// WHATSAPP REPORTS
+// ══════════════════════════════
+
+function fmtWpp(v){
+  v=Math.max(0,v);
+  if(v>=1000000)return'R$ '+(v/1000000).toFixed(1)+'M';
+  if(v>=1000)return'R$ '+(v/1000).toFixed(1)+'k';
+  return'R$ '+Math.round(v);
+}
+
+function sendWhatsApp(msg){
+  const encoded=encodeURIComponent(msg);
+  window.open('https://wa.me/?text='+encoded,'_blank');
+}
+
+function relatorioSetor(setor){
+  const cl=SETORES[setor];
+  const st=stats(cl);
+  const n=numSetor(setor);
+  const hoje=new Date(2026,5,12);
+  const dataStr=hoje.toLocaleDateString('pt-BR');
+
+  // Clientes regredindo com PFAT
+  const regList=cl.filter(c=>c.regredindo===1)
+    .sort((a,b)=>(b.real_maio-b.projetado)-(a.real_maio-a.projetado))
+    .slice(0,10);
+
+  // Clientes compraram maio não junho
+  const perdList=cl.filter(c=>c.comprou_maio_nao_junho===1)
+    .sort((a,b)=>b.real_maio-a.real_maio)
+    .slice(0,10);
+
+  const ritmoEmoji={verde:'✅',azul:'⚡',vermelho:'🔴',neutro:'⚪'}[st.ritmo.status]||'⚪';
+  const projEmoji=st.vp>=st.vm?'✅':'❌';
+
+  let msg=`⚡ *REGIONAL 1505 | Setor ${n}*
+📅 ${dataStr} | ${DIAS_REST} dias restantes
+${'━'.repeat(28)}
+
+📊 *RESUMO DO MÊS*
+Meta:        ${fmtWpp(st.vm)}
+Realizado:   ${fmtWpp(st.vr)} _(${st.p}%)_
+Falta:       ${fmtWpp(st.falta)}
+Meta dia:    ${fmtWpp(st.dia)}
+
+📈 *PROJEÇÃO*
+Projetado:   ${fmtWpp(st.vp)}
+Status:      ${projEmoji} ${st.vp>=st.vm?'Projeta bater a meta':'Não projeta bater a meta'}
+Ritmo:       ${ritmoEmoji} ${st.ritmo.txt}
+
+👥 *CLIENTES*
+Total:          ${st.total}
+Batendo meta:   ${st.pBat}%
+Sem compra:     ${st.sem}
+Abaixo R$5k:    ${st.sub}
+Acima R$5k:     ${st.ok}`;
+
+  if(perdList.length>0){
+    msg+=`
+
+⚠️ *COMPRARAM EM MAIO — SEM COMPRA AINDA (${perdList.length})*`;
+    perdList.forEach(c=>{
+      msg+=`
+• ${c.pfat||c.cod} — ${c.razao.substring(0,25)}`;
+    });
+  }
+
+  if(regList.length>0){
+    msg+=`
+
+📉 *CLIENTES REGREDINDO (${regList.length})*`;
+    regList.forEach(c=>{
+      const diff=fmtWpp(c.real_maio-c.projetado);
+      msg+=`
+• ${c.pfat||c.cod} — ${c.razao.substring(0,25)} _(queda ${diff})_`;
+    });
+  }
+
+  msg+=`
+
+${'━'.repeat(28)}
+_Regional 1505 · Jun/2026_`;
+
+  sendWhatsApp(msg);
+}
+
+function relatorioGeral(){
+  const s=stats(DATA);
+  const hoje=new Date(2026,5,12);
+  const dataStr=hoje.toLocaleDateString('pt-BR');
+
+  const setList=Object.entries(SETORES)
+    .map(([setor,cl])=>({setor,n:numSetor(setor),st:stats(cl)}))
+    .sort((a,b)=>b.st.p-a.st.p);
+
+  const ritmoEmoji={verde:'✅',azul:'⚡',vermelho:'🔴',neutro:'⚪'};
+  const projEmoji=s.vp>=s.vm?'✅':'❌';
+
+  let msg=`⚡ *REGIONAL 1505 — RELATÓRIO GERAL*
+📅 ${dataStr} | ${DIAS_REST} dias restantes
+${'━'.repeat(28)}
+
+📊 *RESUMO DA REGIONAL*
+Meta:        ${fmtWpp(s.vm)}
+Realizado:   ${fmtWpp(s.vr)} _(${s.p}%)_
+Projetado:   ${fmtWpp(s.vp)} ${projEmoji}
+Falta:       ${fmtWpp(s.falta)}
+Meta dia:    ${fmtWpp(s.dia)}
+
+👥 *CLIENTES*
+Total:          ${s.total}
+Batendo meta:   ${s.pBat}%
+Compraram/mai:  ${s.perdidos} sem compra ainda
+Regredindo:     ${s.reg}
+
+🏆 *RANKING DOS SETORES*`;
+
+  setList.forEach(({n,st},i)=>{
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}º`;
+    const ritmo=ritmoEmoji[st.ritmo.status]||'⚪';
+    msg+=`
+${medal} Setor ${n}: ${st.p}% | ${fmtWpp(st.vr)} | Meta dia: ${fmtWpp(st.dia)} ${ritmo}`;
+  });
+
+  msg+=`
+
+${'━'.repeat(28)}
+_Regional 1505 · Jun/2026_`;
+
+  sendWhatsApp(msg);
+}
+
 </script>
 </body>
 </html>
