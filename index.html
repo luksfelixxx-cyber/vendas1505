@@ -178,8 +178,46 @@ body{font-family:'Inter',sans-serif;background:#002060;min-height:100vh;-webkit-
 .bn.active .bnIco{color:#fff}
 .bnLbl{font-size:10px;font-weight:600;color:rgba(255,255,255,0.28);transition:color .15s}.bn.active .bnLbl{color:#fff}
 .toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:#001540;color:#fff;padding:10px 22px;border-radius:12px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;font-weight:600;border:1px solid rgba(255,255,255,.12)}
-.toast.show{opacity:1}</style></head><body>
+.toast.show{opacity:1}
+.dskNav{display:none}
+@media (min-width:900px){
+  html{background:#081336}
+  body{max-width:none;background:#081336;display:flex;justify-content:center;padding:0;margin:0}
+  #appShell{max-width:1180px;width:100%;background:#002060;min-height:100vh;box-shadow:0 0 60px rgba(0,0,0,.5)}
+  .topbar{padding:18px 32px 14px}
+  .dskNav{display:flex;gap:6px;background:rgba(255,255,255,0.08);border-radius:12px;padding:4px}
+  .dskNavItem{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:600;color:rgba(255,255,255,.55);cursor:pointer;transition:all .15s}
+  .dskNavItem:hover{color:#fff}
+  .dskNavItem.active{background:#fff;color:#002060}
+  .bc{padding:4px 32px 10px}
+  .hero-wrap{padding:14px 32px 10px}
+  .mp-wrap{padding:8px 32px 16px}
+  .sec-lbl{padding:6px 32px 12px}
+  .resumo{margin:0 32px 18px}
+  .sc-grid{padding:0 32px 16px;grid-template-columns:repeat(5,1fr)}
+  .sc-leader{margin:0 32px 14px;max-width:440px}
+  .stHero{padding:0 32px 18px}
+  .tabsRow{padding:0 32px}
+  .listWrap{padding:18px 32px 24px}
+  .cl{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .cdHero{padding:0 32px 22px}
+  .cdBody{padding:18px 32px 24px;max-width:760px;margin:0 auto}
+  .bnav{display:none}
+  .view{padding-bottom:24px}
+  .modal-box{max-width:560px;margin:0 auto;border-radius:24px;max-height:85vh}
+  .modal-overlay{align-items:center}
+  .sc-leader,.sc-mini,.ci,.titCliente,.infoCard,.pCard,.m5k,.tkCard,.upBtn{cursor:pointer}
+}
+@media (min-width:1300px){
+  .cl{grid-template-columns:repeat(3,1fr)}
+  .sc-grid{grid-template-columns:repeat(6,1fr)}
+}
+</style></head><body><div id="appShell">
 <div class="topbar"><div class="tb-logo" id="logoBtn">&#9889; Regional 1505</div>
+<div class="dskNav" id="dskNav">
+<span class="dskNavItem active" id="dnRes" onclick="showView('vOv');renderOverview()">Resumo</span>
+<span class="dskNavItem" id="dnSet" onclick="if(curSetor)showView('vSt');else showView('vOv')">Setores</span>
+</div>
 <div class="tb-right-row"><span class="tb-date" id="updInfo">19/Jun/2026</span>
 <button class="upBtn" onclick="document.getElementById('fi').click()">&#128260; Atualizar</button></div>
 <input type="file" id="fi" accept=".xlsx,.xls,.csv" multiple onchange="handleFile(event)"></div>
@@ -491,9 +529,10 @@ function processFiles(vendasF,titF){
   document.getElementById(id).classList.add("on");
   window.scrollTo(0,0);updateBC(id);
   ["bnRes","bnSet","bnCli"].forEach(function(b){var el=document.getElementById(b);if(el)el.classList.remove("active");});
-  if(id==="vOv")document.getElementById("bnRes").classList.add("active");
-  else if(id==="vSt")document.getElementById("bnSet").classList.add("active");
-  else if(id==="vCl")document.getElementById("bnCli").classList.add("active");
+  ["dnRes","dnSet"].forEach(function(b){var el=document.getElementById(b);if(el)el.classList.remove("active");});
+  if(id==="vOv"){document.getElementById("bnRes").classList.add("active");document.getElementById("dnRes").classList.add("active");}
+  else if(id==="vSt"){document.getElementById("bnSet").classList.add("active");document.getElementById("dnSet").classList.add("active");}
+  else if(id==="vCl"){document.getElementById("bnCli").classList.add("active");document.getElementById("dnSet").classList.add("active");}
 }
 function updateBC(id){
   var bc=document.getElementById("bc");
@@ -983,4 +1022,4 @@ function relGeral(){
 buildSetores();
 document.getElementById("logoBtn").onclick=function(){showView("vOv");};
 setTimeout(function(){renderOverview();},50);
-</script></body></html>
+</script></div></body></html>
