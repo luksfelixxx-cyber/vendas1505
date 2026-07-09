@@ -111,6 +111,24 @@ body{font-family:'DM Sans',sans-serif;background:#EEF2F7;min-height:100vh;-webki
 .ibG{background:#F0FDF4;border:1px solid #BBF7D0;color:#065F46;border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:12px;font-weight:500}
 .ibO{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E;border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:12px;font-weight:500}
 .cl{display:flex;flex-direction:column;gap:8px}
+.rg-ci{flex-direction:column;align-items:stretch;padding:0;overflow:hidden}
+.rg-top{display:flex;align-items:center;gap:12px;padding:14px 16px}
+.rg-set{font-size:10px;font-weight:700;color:#002060;margin-top:3px}
+.rg-setnum{background:#EEF2F7;border:1px solid #DDE5EF;padding:1px 7px;border-radius:5px;margin-right:4px}
+.rg-vt{font-size:10px;font-weight:700;color:#dc2626;margin-top:3px}
+.rg-det{border-top:1px solid #EEF2F7;background:#F8FAFC;padding:14px 16px}
+.rg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.rg-cell{background:#fff;border:1px solid #DDE5EF;border-radius:10px;padding:9px 10px}
+.rg-l{font-size:8px;font-weight:700;color:#8895AB;letter-spacing:.6px;margin-bottom:3px}
+.rg-v{font-size:12px;font-weight:800;color:#1A1A2E;line-height:1.1}
+.rg-rows{background:#fff;border:1px solid #DDE5EF;border-radius:10px;overflow:hidden}
+.rg-r{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-bottom:1px solid #F1F5F9;font-size:12px}
+.rg-r:last-child{border-bottom:none}
+.rg-rl{color:#8895AB}.rg-rv{font-weight:700;color:#1A1A2E;text-align:right}
+.rg-tit{margin-top:10px;background:#fff;border:1px solid #FECACA;border-radius:10px;padding:10px 12px}
+.rg-tit-h{font-size:11px;font-weight:800;color:#dc2626;margin-bottom:6px}
+.rg-tit-b{display:flex;gap:5px;flex-wrap:wrap}
+.rg-tp{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px}
 .ci{background:#fff;border:1.5px solid #EEF2F7;border-radius:14px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .15s;box-shadow:0 1px 4px rgba(0,32,96,0.05)}
 .ci:hover{border-color:#002060}.ci:active{transform:scale(0.99)}
 .ciDot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
@@ -329,10 +347,10 @@ body{font-family:'DM Sans',sans-serif;background:#EEF2F7;min-height:100vh;-webki
 <div class="stHero">
 <div class="stAvatarWrap"><div class="rep-avatar-lg" style="background:#002060">R</div>
 <div><div class="stT">Regional</div><div class="stRepNm">Todos os clientes &middot; 10 setores</div></div></div>
-<div class="stS" id="regCnt">0 clientes</div>
+<div class="stS" id="rgnCnt">0 clientes</div>
 </div>
 <div class="listWrap">
-<div class="srchWrap"><span class="srchIco">&#128269;</span><input class="srch" id="srReg" placeholder="Buscar nome, cidade, PFAT..." oninput="renderRegList()"></div>
+<div class="srchWrap"><span class="srchIco">&#128269;</span><input class="srch" id="srReg" placeholder="Buscar nome, cidade, PFAT..." oninput="regSrch()"></div>
 <select id="regSetorSel" class="cidade-sel" onchange="setRegSetor(this)"></select>
 <select id="regCidadeSel" class="cidade-sel" onchange="setRegCidade(this)"></select>
 <div class="sortRow" id="regSortRow">
@@ -351,8 +369,8 @@ body{font-family:'DM Sans',sans-serif;background:#EEF2F7;min-height:100vh;-webki
 <button class="fb" onclick="setRegFilt('proj_ok',this)">&#9889; Proj.</button>
 <button class="fb" onclick="setRegFilt('vencido',this)">&#128308; Vencidos</button>
 </div>
-<div id="regSum"></div>
-<div class="cl" id="regList"></div>
+<div id="rgnSum"></div>
+<div class="cl" id="rgnList"></div>
 </div>
 </div>
 <div class="view" id="vRank">
@@ -700,11 +718,12 @@ function renderRegSels(){
     elS.innerHTML=h2;elS.value=regSetor;
   }
 }
-function setRegCidade(s){regCidade=s.value;renderRegList();}
-function setRegSetor(s){regSetor=s.value;renderRegList();}
+function regSrch(){_REG_OPEN={};renderRegList();}
+function setRegCidade(s){regCidade=s.value;_REG_OPEN={};renderRegList();}
+function setRegSetor(s){regSetor=s.value;_REG_OPEN={};renderRegList();}
 function setRegSort(sk,btn){regSort=sk;
   document.querySelectorAll("#regSortRow .sb").forEach(function(b){b.classList.remove("on");});
-  btn.classList.add("on");renderRegList();}
+  btn.classList.add("on");_REG_OPEN={};renderRegList();}
 function setRegFilt(f,btn){regFilter=f;
   document.querySelectorAll("#regFiltRow .fb").forEach(function(b){b.classList.remove("on");});
   btn.classList.add("on");renderRegList();}
@@ -719,13 +738,12 @@ function renderRegList(){
   else if(regFilter==="proj_ok")arr=arr.filter(function(c){return c.proj_ok===1;});
   else if(regFilter==="vencido")arr=arr.filter(function(c){return c.tem_vencido===1;});
   arr=fSrch(arr,s);arr=sortArr(arr,regSort);
-  _CL=[];
-  document.getElementById("regCnt").textContent=arr.length+" clientes";
-  document.getElementById("regSum").innerHTML=arr.length>1?sumStrip(arr):"";
-  document.getElementById("regList").innerHTML=arr.map(ciHtml).join("")||"<div class=\"empty\">Nenhum</div>";
+  document.getElementById("rgnCnt").textContent=arr.length+" clientes";
+  document.getElementById("rgnSum").innerHTML=arr.length>1?sumStrip(arr):"";
+  document.getElementById("rgnList").innerHTML=arr.map(function(c,i){return ciRegHtml(c,i);}).join("")||"<div class=\"empty\">Nenhum</div>";
 }
 function openRegional(){
-  regFilter="all";regSort="real_desc";regCidade="all";regSetor="all";
+  regFilter="all";regSort="real_desc";regCidade="all";regSetor="all";_REG_OPEN={};
   var sr=document.getElementById("srReg");if(sr)sr.value="";
   document.querySelectorAll("#regSortRow .sb").forEach(function(b,i){b.classList.toggle("on",i===0);});
   document.querySelectorAll("#regFiltRow .fb").forEach(function(b,i){b.classList.toggle("on",i===0);});
@@ -913,6 +931,77 @@ function fSrch(arr,s){
   if(!s)return arr;
   return arr.filter(function(c){return c.razao.toLowerCase().indexOf(s)>=0||(c.bandeira||"").toLowerCase().indexOf(s)>=0||(c.cidade||"").toLowerCase().indexOf(s)>=0||(c.pfat||"").toLowerCase().indexOf(s)>=0||(c.cod||"").toLowerCase().indexOf(s)>=0;});
 }
+function fmtCnpj(v){
+  if(!v)return "--";
+  var s=String(v).replace(/\D/g,"");
+  if(s.length!==14)return esc(String(v));
+  return s.substr(0,2)+"."+s.substr(2,3)+"."+s.substr(5,3)+"/"+s.substr(8,4)+"-"+s.substr(12,2);
+}
+var _REG_OPEN={};
+function toggleReg(id){
+  _REG_OPEN[id]=!_REG_OPEN[id];
+  var el=document.getElementById("rgx-"+id);
+  var ar=document.getElementById("rga-"+id);
+  if(el){el.style.display=_REG_OPEN[id]?"block":"none";}
+  if(ar){ar.innerHTML=_REG_OPEN[id]?"&#9662;":"&rsaquo;";}
+}
+function ciRegHtml(c,i){
+  var real=c.realizado,meta=c.meta,p2=pct(real,meta);
+  var dot=real<=0?"#dc2626":real<5000?"#1d4ed8":"#059669";
+  var ok5=real>=5000;
+  var b5=ok5?"<span class=\"cb\" style=\"background:#f0fdf4;color:#059669;border:1px solid #bbf7d0\">5k &#10003;</span>":"<span class=\"cb\" style=\"background:#fef2f2;color:#dc2626;border:1px solid #fecaca\">5k &#10007;</span>";
+  var bdg=b5;
+  if(c.proj_ok===1)bdg+="<span class=\"cb cbP\">Proj. acima</span>";
+  if(c.tem_vencido===1)bdg+="<span class=\"cb cbV\">Vencidos</span>";
+  var sn=numS(c.setor);
+  var rep=getRepName(sn);
+  var aberto=_REG_OPEN[i]?"block":"none";
+  var seta=_REG_OPEN[i]?"&#9662;":"&rsaquo;";
+  var vt=c.total_vencido||0;
+  /* linha do setor/rep sempre visivel */
+  var setLine="<div class=\"rg-set\"><span class=\"rg-setnum\">Setor "+sn+"</span> &middot; "+esc(rep)+"</div>";
+  /* painel expansivel */
+  var det="<div class=\"rg-det\" id=\"rgx-"+i+"\" style=\"display:"+aberto+"\">"
+    +"<div class=\"rg-grid\">"
+    +"<div class=\"rg-cell\"><div class=\"rg-l\">META</div><div class=\"rg-v\">"+f0(meta)+"</div></div>"
+    +"<div class=\"rg-cell\"><div class=\"rg-l\">REALIZADO</div><div class=\"rg-v\" style=\"color:"+clrP(p2)+"\">"+f0(real)+"</div></div>"
+    +"<div class=\"rg-cell\"><div class=\"rg-l\">PROJETADO</div><div class=\"rg-v\" style=\"color:"+(c.proj_ok?"#059669":"#dc2626")+"\">"+f0(c.projetado)+"</div></div>"
+    +"<div class=\"rg-cell\"><div class=\"rg-l\">FALTA</div><div class=\"rg-v\">"+f0(Math.max(0,meta-real))+"</div></div>"
+    +"<div class=\"rg-cell\"><div class=\"rg-l\">TICKET M&Eacute;DIO</div><div class=\"rg-v\">"+(c.ticket_medio>0?f0(c.ticket_medio):"--")+"</div></div>"
+    +"<div class=\"rg-cell\"><div class=\"rg-l\">FREQ. DIAS</div><div class=\"rg-v\">"+(c.freq_dias>0?c.freq_dias+" dias/m&ecirc;s":"--")+"</div></div>"
+    +"</div>"
+    +"<div class=\"rg-rows\">"
+    +"<div class=\"rg-r\"><span class=\"rg-rl\">CNPJ</span><span class=\"rg-rv\">"+fmtCnpj(c.cnpj)+"</span></div>"
+    +"<div class=\"rg-r\"><span class=\"rg-rl\">PFAT</span><span class=\"rg-rv\" style=\"color:#002060;font-weight:700\">"+esc(c.pfat||"--")+"</span></div>"
+    +"<div class=\"rg-r\"><span class=\"rg-rl\">SAP</span><span class=\"rg-rv\" style=\"color:#8895AB\">"+esc(c.cod)+"</span></div>"
+    +"<div class=\"rg-r\"><span class=\"rg-rl\">Cidade</span><span class=\"rg-rv\">"+esc(c.cidade||"--")+"</span></div>"
+    +"<div class=\"rg-r\"><span class=\"rg-rl\">Segmento</span><span class=\"rg-rv\">"+esc(c.segmento||"--")+"</span></div>"
+    +"</div>";
+  if(vt>0){
+    det+="<div class=\"rg-tit\"><div class=\"rg-tit-h\">&#128308; T&Iacute;TULOS: "+f0(vt)+" &middot; "+c.qtd_titulos+" doc(s)</div>"
+      +"<div class=\"rg-tit-b\">"
+      +(c.vencido_total>0?"<span class=\"rg-tp\" style=\"background:#FEF2F2;color:#dc2626\">Vencidos "+fk(c.vencido_total)+" ("+c.vencido_qtd+")</span>":"")
+      +(c.perda_total>0?"<span class=\"rg-tp\" style=\"background:#FFFBEB;color:#92400E\">Perdas "+fk(c.perda_total)+" ("+c.perda_qtd+")</span>":"")
+      +(c.recuperacao_total>0?"<span class=\"rg-tp\" style=\"background:#F5F3FF;color:#6d28d9\">Recup. "+fk(c.recuperacao_total)+" ("+c.recuperacao_qtd+")</span>":"")
+      +"</div></div>";
+  }
+  det+="</div>";
+  return "<div class=\"ci rg-ci\" onclick=\"toggleReg("+i+")\">"
+    +"<div class=\"rg-top\">"
+    +"<div class=\"ciDot\" style=\"background:"+dot+"\"></div>"
+    +"<div class=\"ciInf\"><div class=\"ciNm\">"+esc(c.razao)+"</div>"
+    +setLine
+    +"<div class=\"ciSg\">"+esc(c.bandeira||c.segmento)+(c.cidade?" &middot; "+esc(c.cidade):"")+(c.pfat?"<span class=\"ci-pfat\"> &middot; "+esc(c.pfat)+"</span>":"")+"</div>"
+    +"<div class=\"ciBdg\">"+bdg+"</div>"
+    +(c.ticket_medio>0?"<div class=\"ciTk\">Ticket "+f0(c.ticket_medio)+(c.freq_dias>0?" &middot; "+c.freq_dias+" dias/m&ecirc;s":"")+"</div>":"")
+    +(vt>0?"<div class=\"rg-vt\">&#128308; T&iacute;tulos: "+f0(vt)+"</div>":"")
+    +"</div>"
+    +"<div class=\"ciR\"><div class=\"ciV\" style=\"color:"+clrP(p2)+"\">"+f0(real)+"</div>"
+    +"<div class=\"ciM\">meta "+fk(meta)+"</div>"
+    +"<div class=\"ciP\" style=\"color:"+clrP(p2)+"\">"+p2+"%</div></div>"
+    +"<div class=\"ciArr\" id=\"rga-"+i+"\">"+seta+"</div>"
+    +"</div>"+det+"</div>";
+}
 function ciHtml(c){
   var real=c.realizado,meta=c.meta,p2=pct(real,meta);
   var dot=real<=0?"#dc2626":real<5000?"#1d4ed8":"#059669";
@@ -1042,6 +1131,7 @@ function openClient(c){
     "<div class=\"ir\"><span class=\"irL\">Freq. dias c/ pedidos</span><span class=\"irR\">"+(c.freq_dias>0?c.freq_dias+" dias/mes":"--")+"</span></div>"+
     "<div class=\"ir\"><span class=\"irL\">Cidade</span><span class=\"irR\">"+esc(c.cidade||"--")+"</span></div>"+
     "<div class=\"ir\"><span class=\"irL\">Segmento</span><span class=\"irR\">"+esc(c.segmento)+"</span></div>"+
+    "<div class=\"ir\"><span class=\"irL\">CNPJ</span><span class=\"irR\">"+fmtCnpj(c.cnpj)+"</span></div>"+
     "<div class=\"ir\"><span class=\"irL\">PFAT</span><span class=\"irR\" style=\"color:#002060;font-weight:700\">"+esc(c.pfat||"--")+"</span></div>"+
     "<div class=\"ir\"><span class=\"irL\">SAP</span><span class=\"irR\" style=\"color:#8895AB\">"+esc(c.cod)+"</span></div>";
   showView("vCl");
