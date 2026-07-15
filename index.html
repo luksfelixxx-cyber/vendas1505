@@ -287,6 +287,10 @@ body{font-family:'DM Sans',sans-serif;background:#EEF2F7;min-height:100vh;-webki
 .rs-parr{color:#C4CDD6;font-size:19px;flex-shrink:0;margin-left:2px}
 .rs-prio-empty{text-align:center;color:#8895AB;font-size:13px;padding:24px}
 .rs-prio-grp{font-size:11px;font-weight:700;color:#B0BBC8;letter-spacing:.4px;padding:12px 6px 6px;text-transform:uppercase}
+.rs-metadia{width:calc(100% - 32px);margin:20px 16px 0;background:#fff;border:1px solid #EDF1F6;border-bottom:none;border-radius:16px 16px 0 0;padding:13px 18px;display:flex;align-items:center;gap:10px}
+.rs-metadia-l{flex:1;font-size:12px;font-weight:700;color:#8895AB;letter-spacing:.4px}
+.rs-metadia-v{font-size:15px;font-weight:800;color:#0A1E42}
+.rs-metadia+.rs-reg-btn{margin-top:0;border-radius:0 0 16px 16px}
 .rs-reg-btn{width:calc(100% - 32px);margin:20px 16px 0;background:#002060;border:none;color:#fff;padding:16px 18px;border-radius:16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:12px}
 .rs-reg-btn:active{opacity:.9}
 .rs-reg-ico{font-size:17px}
@@ -380,6 +384,10 @@ body{font-family:'DM Sans',sans-serif;background:#EEF2F7;min-height:100vh;-webki
   </div>
 </div>
 
+<div class="rs-metadia">
+  <span class="rs-metadia-l">META DIA</span>
+  <span class="rs-metadia-v" id="rsMetaDia">--</span>
+</div>
 <button class="rs-reg-btn" onclick="openRegional()">
   <span class="rs-reg-ico">&#128203;</span>
   <span class="rs-reg-tx">1505</span>
@@ -878,6 +886,7 @@ function fabWpp(){
   elpp.style.color=ppj>=100?"#059669":"#dc2626";
   document.getElementById("rsBFalta").textContent=fk(falta);
   document.getElementById("rsBFaltaP").textContent=s.bat+" batendo";
+  document.getElementById("rsMetaDia").textContent=fk(s.dia);
   var tv=0;DATA.forEach(function(c){tv+=(c.total_vencido||0);});
   document.getElementById("rsTitVal").textContent=f0(tv);
   setTimeout(function(){var b=document.getElementById("rsBar");if(b)b.style.width=Math.min(p,100)+"%";},250);
