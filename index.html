@@ -345,6 +345,10 @@ body{font-family:'DM Sans',sans-serif;background:#EEF2F7;min-height:100vh;-webki
 .dia-note{font-size:10px;color:#B0BBC8;margin-top:8px;text-align:center}
 
 /* ===== RESUMO BLOCOS ===== */
+.rs-metahdr{background:#002060;border-radius:16px 16px 0 0;padding:13px 16px;display:flex;align-items:center;gap:10px;margin-top:18px}
+.rs-metahdr-l{flex:1;font-size:11px;font-weight:700;color:#9DB2D4;letter-spacing:.8px}
+.rs-metahdr-v{font-size:17px;font-weight:800;color:#fff}
+.rs-metahdr+.rs-blocks{margin-top:0;border-top:none;border-radius:0 0 16px 16px}
 .rs-blocks{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#EDF1F6;border:1px solid #EDF1F6;border-radius:16px;overflow:hidden;margin-top:18px}
 .rs-blk{background:#fff;padding:14px 10px;text-align:center}
 .rs-blk-mid{background:#F8FAFC}
@@ -380,6 +384,10 @@ body{font-family:'DM Sans',sans-serif;background:#EEF2F7;min-height:100vh;-webki
   <div class="rs-val" id="rsVal">--</div>
   <div class="rs-bar"><div class="rs-bar-fill" id="rsBar"></div></div>
   <div class="rs-barlbl"><span id="rsPct">0%</span><span class="rs-meta-lbl">de <span id="rsMeta">--</span></span></div>
+  <div class="rs-metahdr">
+    <span class="rs-metahdr-l">META DO M&Ecirc;S</span>
+    <span class="rs-metahdr-v" id="rsMetaTop">--</span>
+  </div>
   <div class="rs-blocks">
     <div class="rs-blk"><div class="rs-blk-l">REALIZADO</div><div class="rs-blk-v" id="rsBReal">--</div><div class="rs-blk-s" id="rsBRealP">--</div></div>
     <div class="rs-blk rs-blk-mid"><div class="rs-blk-l">PROJE&Ccedil;&Atilde;O</div><div class="rs-blk-v" id="rsBProj">--</div><div class="rs-blk-s" id="rsBProjP">--</div></div>
@@ -513,7 +521,7 @@ body{font-family:'DM Sans',sans-serif;background:#EEF2F7;min-height:100vh;-webki
 <button class="fab-wpp" onclick="fabWpp()" title="WhatsApp">
 <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
 </button>
-<script>var APP_VERSION="20260806";
+<script>var APP_VERSION="20260806b";
 (function(){
   function chkVer(){
     if(!window.fetch)return;
@@ -915,6 +923,7 @@ function fabWpp(){
   elpp.style.color=ppj>=100?"#059669":"#dc2626";
   document.getElementById("rsBFalta").textContent=fk(falta);
   document.getElementById("rsBFaltaP").textContent=s.bat+" batendo";
+  document.getElementById("rsMetaTop").textContent=f0(s.vm);
   document.getElementById("rsMetaDia").textContent=fk(s.dia);
   var tv=0;DATA.forEach(function(c){tv+=(c.total_vencido||0);});
   document.getElementById("rsTitVal").textContent=f0(tv);
@@ -990,7 +999,7 @@ function openSetor(setor){
   var pp=pct(st.vp,st.vm);var falta=Math.max(0,st.vm-st.vr);
   var corProj=pp>=100?"#059669":"#dc2626";
   document.getElementById("stCards").innerHTML=
-    "<div class=\"rs-blocks\" style=\"margin-top:0\">"+
+    "<div class=\"rs-metahdr\" style=\"margin-top:0\">"+"<span class=\"rs-metahdr-l\">META DO SETOR</span>"+"<span class=\"rs-metahdr-v\">"+f0(st.vm)+"</span>"+"</div>"+"<div class=\"rs-blocks\">"+
     "<div class=\"rs-blk\"><div class=\"rs-blk-l\">REALIZADO</div><div class=\"rs-blk-v\" style=\"color:"+clrP(p)+"\">"+fk(st.vr)+"</div><div class=\"rs-blk-s\">"+p+"% da meta</div></div>"+
     "<div class=\"rs-blk rs-blk-mid\"><div class=\"rs-blk-l\">PROJE&Ccedil;&Atilde;O</div><div class=\"rs-blk-v\">"+fk(st.vp)+"</div><div class=\"rs-blk-s\" style=\"color:"+corProj+"\">"+pp+"% da meta</div></div>"+
     "<div class=\"rs-blk\"><div class=\"rs-blk-l\">FALTA</div><div class=\"rs-blk-v\">"+fk(falta)+"</div><div class=\"rs-blk-s\">"+st.pBat+"% batendo</div></div>"+
